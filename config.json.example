@@ -1,0 +1,11 @@
+{
+  "calendar": {
+    "google_sheet": {
+      "url": "https://docs.google.com/spreadsheets/d/spreadsheetID/edit?usp=sharing"
+    }
+  },
+  "oauth2": {
+    "client_id": "......apps.googleusercontent.com",
+    "client_secret": "secret"
+  }
+}

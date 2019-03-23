@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option go_package = "github.com/j-fuentes/bdaybot-slack/api;bdaybot";
+
+package bdaybot;
+
+message GoogleSheet {
+    string url = 1;
+}
+
+message Calendar {
+    oneof calendar {
+        GoogleSheet google_sheet = 1;
+    }
+}
+
+message OAuth2 {
+    string client_id = 1;
+    string client_secret = 2;
+}
+
+message Config {
+    Calendar calendar = 1;
+    OAuth2 oauth2 = 2;
+}

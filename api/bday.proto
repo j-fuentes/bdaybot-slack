@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "github.com/j-fuentes/bdaybot-slack/api;bdaybot";
+
+package bdaybot;
+
+message Bday {
+    message Date {
+        int32 month = 2;
+        int32 day = 1;
+    }
+
+    string userID = 1;
+    Date date = 2;
+}
