@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
+	"time"
 
 	"github.com/golang/glog"
 	"github.com/golang/protobuf/jsonpb"
 	bdaybot "github.com/j-fuentes/bdaybot-slack/api"
 	"github.com/j-fuentes/bdaybot-slack/internal/calendar/googlesheet"
 	"github.com/j-fuentes/bdaybot-slack/internal/oauth2"
+	"github.com/j-fuentes/bdaybot-slack/internal/slack"
 )
 
 var configFile string
@@ -28,7 +31,6 @@ func init() {
 }
 
 func main() {
-
 	configReader, err := os.Open(configFile)
 	if err != nil {
 		glog.Fatalf("%+v", err)
@@ -59,14 +61,36 @@ func main() {
 		glog.Fatalf("%+v", err)
 	}
 
+	glog.Infof("Reading bdays from %s\n", config.GetCalendar().GetGoogleSheet().GetUrl())
 	bdays, err := reader.GetBdays()
 	if err != nil {
 		glog.Fatalf("%+v", err)
 	}
 
+	glog.Infof("%d names were loaded.\n", len(bdays))
+
+	webhookURL := config.GetSlack().GetWebhookUrl()
+	prefix := config.GetSlack().GetSalutePrefix()
+	suffix := config.GetSlack().GetSaluteSuffix()
+
+	_, month, day := time.Now().Date()
+	names := []string{}
 	for _, bday := range bdays {
-		// TODO: is today? -> sent message in slack
-		fmt.Println(bday)
+		if bday.GetDate().GetMonth() == int32(month) &&
+			bday.GetDate().GetDay() == int32(day) {
+			glog.Infof("It is @%s bday!\n", bday.GetUserId())
+			names = append(names, bday.GetUserId())
+		}
+	}
+
+	if numNames := len(names); numNames > 0 {
+		people := fmt.Sprintf("@%s", names[0])
+		if numNames > 1 {
+			people = fmt.Sprintf("@%s and @%s", strings.Join(names[:len(names)-1], ", "), names[len(names)-1])
+		}
+		glog.Infof("Sending salute to %s via Slack webhook %s\n", people, webhookURL)
+		slackClient := slack.NewClient(webhookURL)
+		slackClient.SendMessage(fmt.Sprintf("%s %s %s", prefix, people, suffix))
 	}
 }
 

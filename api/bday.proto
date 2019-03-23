@@ -10,6 +10,6 @@ message Bday {
         int32 day = 1;
     }
 
-    string userID = 1;
+    string user_id = 1;
     Date date = 2;
 }

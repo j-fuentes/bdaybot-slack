@@ -19,7 +19,14 @@ message OAuth2 {
     string client_secret = 2;
 }
 
+message Slack {
+    string webhook_url = 1;
+    string salute_prefix = 2;
+    string salute_suffix = 3;
+}
+
 message Config {
     Calendar calendar = 1;
     OAuth2 oauth2 = 2;
+    Slack slack = 3;
 }

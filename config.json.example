@@ -1,11 +1,16 @@
 {
   "calendar": {
     "google_sheet": {
-      "url": "https://docs.google.com/spreadsheets/d/spreadsheetID/edit?usp=sharing"
+      "url": "https://docs.google.com/spreadsheets/d/<your_sheet>/edit?usp=sharing"
     }
   },
   "oauth2": {
-    "client_id": "......apps.googleusercontent.com",
-    "client_secret": "secret"
+    "client_id": "something.apps.googleusercontent.com",
+    "client_secret": ""
+  },
+  "slack": {
+    "webhook_url": "https://hooks.slack.com/services/something",
+    "salute_prefix": "Happy bday",
+    "salute_suffix": "! :tada:"
   }
 }

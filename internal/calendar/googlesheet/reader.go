@@ -7,7 +7,6 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/golang/glog"
 	bdaybot "github.com/j-fuentes/bdaybot-slack/api"
 	"google.golang.org/api/sheets/v4"
 )
@@ -33,7 +32,6 @@ func NewReader(client *http.Client, sheetID string) (*Reader, error) {
 }
 
 func (r *Reader) GetBdays() ([]*bdaybot.Bday, error) {
-	fmt.Println(r.sheetID)
 	// The spreadsheet is supposed to have a format like:
 	//  | Name   | Date   |
 	//  | rick   | 12/21  |
@@ -48,28 +46,25 @@ func (r *Reader) GetBdays() ([]*bdaybot.Bday, error) {
 	bdays := []*bdaybot.Bday{}
 	if len(resp.Values) == 0 {
 		return nil, fmt.Errorf("No data found")
-	} else {
-		glog.Info("Name, BDay:")
-		for idx, row := range resp.Values {
-			name := fmt.Sprintf("%s", row[0])
-			if name == "" {
-				return nil, fmt.Errorf("Empty name in row %d", idx+2)
-			}
+	}
 
-			rawdate := fmt.Sprintf("%s", row[1])
-
-			glog.Info("%s, %s\n", name, rawdate)
-
-			date, err := parseDate(rawdate)
-			if err != nil {
-				return nil, fmt.Errorf("Cannot parse date in row %d: %+v", idx+2, err)
-			}
-
-			bdays = append(bdays, &bdaybot.Bday{
-				UserID: name,
-				Date:   date,
-			})
+	for idx, row := range resp.Values {
+		name := fmt.Sprintf("%s", row[0])
+		if name == "" {
+			return nil, fmt.Errorf("Empty name in row %d", idx+2)
 		}
+
+		rawdate := fmt.Sprintf("%s", row[1])
+
+		date, err := parseDate(rawdate)
+		if err != nil {
+			return nil, fmt.Errorf("Cannot parse date in row %d: %+v", idx+2, err)
+		}
+
+		bdays = append(bdays, &bdaybot.Bday{
+			UserId: name,
+			Date:   date,
+		})
 	}
 
 	return bdays, nil
