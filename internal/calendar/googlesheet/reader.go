@@ -2,7 +2,6 @@ package googlesheet
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -40,7 +39,7 @@ func (r *Reader) GetBdays() ([]*bdaybot.Bday, error) {
 	readRange := "A2:B"
 	resp, err := r.srv.Spreadsheets.Values.Get(r.sheetID, readRange).Do()
 	if err != nil {
-		log.Fatalf("Unable to retrieve data from sheet: %v", err)
+		return nil, fmt.Errorf("Unable to retrieve data from sheet: %v", err)
 	}
 
 	bdays := []*bdaybot.Bday{}

@@ -21,6 +21,7 @@ message OAuth2 {
 
 message Slack {
     string webhook_url = 1;
+    string admin_webhook_url = 4;
     string salute_prefix = 2;
     string salute_suffix = 3;
 }

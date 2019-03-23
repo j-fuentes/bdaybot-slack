@@ -17,13 +17,23 @@ func NewClient(webhookURL string) *Client {
 	}
 }
 
-func (c *Client) SendMessage(text string) error {
-	body, _ := json.Marshal(slackRequestBody{
-		Text:  text,
-		Parse: "full",
-	})
+type SlackRequestBody struct {
+	Text        string        `json:"text"`
+	Parse       string        `json:"parse"`
+	Attachments []*Attachment `json:"attachments"`
+}
 
-	req, err := http.NewRequest(http.MethodPost, c.webhookURL, bytes.NewBuffer(body))
+type Attachment struct {
+	Color   string `json:"color"`
+	Pretext string `json:"pretext"`
+	Title   string `json:"title"`
+	Text    string `json:"text"`
+}
+
+func (c *Client) Send(body *SlackRequestBody) error {
+	jsonBody, _ := json.Marshal(*body)
+
+	req, err := http.NewRequest(http.MethodPost, c.webhookURL, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return err
 	}
@@ -44,7 +54,9 @@ func (c *Client) SendMessage(text string) error {
 	return nil
 }
 
-type slackRequestBody struct {
-	Text  string `json:"text"`
-	Parse string `json:"parse"`
+func (c *Client) SendMessage(text string) error {
+	return c.Send(&SlackRequestBody{
+		Text:  text,
+		Parse: "full",
+	})
 }

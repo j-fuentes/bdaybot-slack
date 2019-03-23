@@ -10,6 +10,7 @@
   },
   "slack": {
     "webhook_url": "https://hooks.slack.com/services/something",
+    "admin_webhook_url": "https://hooks.slack.com/services/something",
     "salute_prefix": "Happy bday",
     "salute_suffix": "! :tada:"
   }

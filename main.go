@@ -39,6 +39,8 @@ func main() {
 	var config bdaybot.Config
 	jsonpb.Unmarshal(configReader, &config)
 
+	adminWebhookURL := config.GetSlack().GetAdminWebhookUrl()
+
 	if auth {
 		glog.Info("Starting auth workflow...")
 		token, err := oauth2.RetrieveTokenInteractively(googlesheet.GenOauthConfig(
@@ -56,14 +58,33 @@ func main() {
 		os.Exit(0)
 	}
 
+	var slackAdminClient *slack.Client
+	if adminWebhookURL != "" {
+		glog.Infof("Found slack webhook for admin, events will be reported to %s\n", adminWebhookURL)
+		slackAdminClient = slack.NewClient(adminWebhookURL)
+	} else {
+		glog.Infof("Did not found a slack webhook for admin\n")
+	}
+
 	reader, err := genGooglesheetReader(config)
 	if err != nil {
+		sendErrorToSlack(
+			slackAdminClient,
+			"Cannot connect to Google Spreadsheets",
+			err,
+		)
 		glog.Fatalf("%+v", err)
 	}
 
-	glog.Infof("Reading bdays from %s\n", config.GetCalendar().GetGoogleSheet().GetUrl())
+	spreadsheetURL := config.GetCalendar().GetGoogleSheet().GetUrl()
+	glog.Infof("Reading bdays from %s\n", spreadsheetURL)
 	bdays, err := reader.GetBdays()
 	if err != nil {
+		sendErrorToSlack(
+			slackAdminClient,
+			fmt.Sprintf("Error while reading data from spreadsheet (%s)", spreadsheetURL),
+			err,
+		)
 		glog.Fatalf("%+v", err)
 	}
 
@@ -89,8 +110,23 @@ func main() {
 			people = fmt.Sprintf("@%s and @%s", strings.Join(names[:len(names)-1], ", "), names[len(names)-1])
 		}
 		glog.Infof("Sending salute to %s via Slack webhook %s\n", people, webhookURL)
+		sendInfoToSlack(
+			slackAdminClient,
+			fmt.Sprintf("Saying happy birthday to %s", people),
+			fmt.Sprintf("%d bdays were found in the spreadsheet (%s)", numNames, spreadsheetURL),
+		)
 		slackClient := slack.NewClient(webhookURL)
-		slackClient.SendMessage(fmt.Sprintf("%s %s %s", prefix, people, suffix))
+		err := slackClient.SendMessage(fmt.Sprintf("%s %s %s", prefix, people, suffix))
+		if err != nil {
+			glog.Fatalf("%+v", err)
+		}
+	} else {
+		sendInfoToSlack(
+			slackAdminClient,
+			"Today is no one's birthday",
+			fmt.Sprintf("No birthdays found on the spreadsheet (%s)", spreadsheetURL),
+		)
+		glog.Info("Today is no one's birthday")
 	}
 }
 
@@ -99,7 +135,7 @@ func genGooglesheetReader(config bdaybot.Config) (*googlesheet.Reader, error) {
 
 	sheetID, err := getSheetID(config.GetCalendar().GetGoogleSheet())
 	if err != nil {
-		glog.Fatalf("%+v", err)
+		return nil, fmt.Errorf("%+v", err)
 	}
 
 	token, err := oauth2.ReadTokenFromFile(userTokenFile)
@@ -120,4 +156,49 @@ func getSheetID(sheet *bdaybot.GoogleSheet) (string, error) {
 	}
 
 	return match[1], nil
+}
+
+func sendErrorToSlack(client *slack.Client, title string, err error) {
+	if client == nil {
+		return
+	}
+
+	err2 := client.Send(&slack.SlackRequestBody{
+		Text:  "Error from bdaybot",
+		Parse: "full",
+		Attachments: []*slack.Attachment{
+			&slack.Attachment{
+				Color:   "#e23434",
+				Pretext: "Something bad happened",
+				Title:   title,
+				Text:    fmt.Sprintf("```%+v```", err),
+			},
+		},
+	})
+
+	if err2 != nil {
+		glog.Infof("Cannot send information to slack: %+v", err)
+	}
+}
+
+func sendInfoToSlack(client *slack.Client, title string, msg string) {
+	if client == nil {
+		return
+	}
+
+	err := client.Send(&slack.SlackRequestBody{
+		Text:  "Info from bdaybot",
+		Parse: "full",
+		Attachments: []*slack.Attachment{
+			&slack.Attachment{
+				Color: "#2159b2",
+				Title: title,
+				Text:  msg,
+			},
+		},
+	})
+
+	if err != nil {
+		glog.Infof("Cannot send information to slack: %+v", err)
+	}
 }
