@@ -1,6 +1,6 @@
 # bdaybot-slack
 
-This is a program that reads a list of people with their birthdays (from a Google Spreadsheet, and says happy bday in Slack.
+This is a program that reads a list of people with their birthdays from a Google Spreadsheet, and says happy bday in Slack.
 
 This is intended to be run by some external mechanism once a day. I run it in a Kubernetes CronJob (see section **Run on Kubernetes** section below).
 
