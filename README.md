@@ -2,7 +2,7 @@
 
 This is a program that reads a list of people with their birthdays (from a Google Spreadsheet, and says happy bday in Slack.
 
-This is intended to be run by some external mechanism once a day. I run it in a [cronjob in Kubernetes](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) (I will update this repo to add the k8s manifest).
+This is intended to be run by some external mechanism once a day. I run it in a Kubernetes CronJob (see section **Run on Kubernetes** section below).
 
 [![demo](./docs/imgs/demo.gif)](https://drive.google.com/file/d/1C6o5qxoTbUxGmmxbXkJMcEWHrllnBxxo/view?usp=sharing)
 
@@ -61,6 +61,30 @@ The docker image logs event to stderr by default.
 docker run -ti -v $PWD/config.json:/config.json -v $PWD/token.json:/token.json josefuentes/bdaybot-slack
 ```
 
+## Run on Kubernetes
+
+This is a way of running this in Kubernetes using a [CronJob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/).
+
+Create the `bdaybot` namespace and the CronJob by running:
+
+```
+kubectl create -f kubernetes.yml
+```
+
+Then, create the secrets for the config and the auth token by running:
+
+```
+kubectl -n bdaybot create secret generic bdaybot-config --from-file=/tmp/bday/config.json
+```
+
+and
+
+```
+kubectl -n bdaybot create secret generic bdaybot-token --from-file=/tmp/bday/token.json
+```
+
+The CronJob is configured to run daily (check [`kubernetes.yml`](./kubernetes.yml))
+
 ## Build from scratch
 
 ### Using Docker
@@ -74,4 +98,3 @@ docker build -t <name of your image> .
 ### Just Go
 
 Just run `go build -o bdaybot` and a binary called `bdaybot` will be generated.
-
