@@ -1,7 +1,7 @@
 {
   "calendar": {
     "google_sheet": {
-      "url": "https://docs.google.com/spreadsheets/d/<your_sheet>/edit?usp=sharing"
+      "url": "https://docs.google.com/spreadsheets/d/1f1GJ7MnUgQOC-RsbB4Vi_m3YnjQqTNbE5_-hyIbfuUk/edit?usp=sharing"
     }
   },
   "oauth2": {
