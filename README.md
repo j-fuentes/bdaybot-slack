@@ -2,7 +2,7 @@
 
 This is a program that reads a list of people with their birthdays from a Google Spreadsheet, and says happy bday in Slack.
 
-This is intended to be run by some external mechanism once a day. I run it in a Kubernetes CronJob (see section **Run on Kubernetes** section below).
+This is intended to be run by some external mechanism once a day. I run it in a Kubernetes CronJob (see section [**Run on Kubernetes**](./README.md#run-on-kubernetes) section below).
 
 [![demo](./docs/imgs/demo.gif)](https://drive.google.com/file/d/1C6o5qxoTbUxGmmxbXkJMcEWHrllnBxxo/view?usp=sharing)
 
