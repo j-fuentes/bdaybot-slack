@@ -30,7 +30,7 @@ Here you have a brief description of the fields in the file:
 
 Holds the information that the app uses to authenticate against Google in order to get access to the spreadsheet.
 
-You can get this by using the `-auth` argument.
+You can generate it by running the tool with `-auth` argument.
 
 ## Standalone run
 
