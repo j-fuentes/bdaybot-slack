@@ -22,11 +22,16 @@ spec:
           - image: josefuentes/bdaybot-slack
             imagePullPolicy: Always
             name: bdaybot
+            args:
+              - -config
+              - /config/config.json
+              - -userTokenFile
+              - /token/token.json
             volumeMounts:
-            - mountPath: /config.json
+            - mountPath: /config
               name: bdaybot-config
               readOnly: true
-            - mountPath: /token.json
+            - mountPath: /token
               name: bdaybot-token
               readOnly: true
           volumes:
