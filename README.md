@@ -20,9 +20,9 @@ Here you have a brief description of the fields in the file:
 
 - `oauth2.client_id` and `oauth2.client_secret`: these are the credentials of the client part of the oauth client, used for the authentication against Google. You can find more info about how to get this setup [here](./docs/client_oauth.md).
 
-- `slack.webhook_url`: Slack webhook url where to send the happy bday messages. 
+- `slack.webhook_url`: Slack webhook url where to send the happy bday messages. See [instructions here](./docs/slack_webhooks.md). 
 
-- `slack.admin_webhook_url`: Slack webhook url where to send errors, or other events.
+- `slack.admin_webhook_url`: Slack webhook url where to send errors, or other events. See [instructions here](./docs/slack_webhooks.md).
 
 - `slack.salute_prefix` and `slack.salute_suffix`: These are used to compose the happy birthday message, which would be something like `<prefix>@alice and @bob<suffix>`. You can use emojis!
 
