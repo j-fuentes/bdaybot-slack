@@ -51,8 +51,11 @@ It will try to read `config.json` and `token.json` from the working directory.
 You can use the same functionality with the docker image. Notice you will need to mount `config.json` and `token.json`:
 
 ```
+# From the root directory of this repository
+
 touch token.json
-docker run -ti -v $PWD/token.json:/token.json josefuentes/bdaybot-slack -auth
+cp config.json.example config.json # Create the config.json file from the test one for the first run
+docker run -ti -v $PWD/token.json:/token.json -v $PWD/config.json:config.json josefuentes/bdaybot-slack -auth
 ```
 
 The docker image logs event to stderr by default.
